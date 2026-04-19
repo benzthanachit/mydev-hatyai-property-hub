@@ -23,7 +23,7 @@ export default function Navbar() {
           <Link href="#properties" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
             Properties
           </Link>
-          <Link href="#expat-guide" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
+          <Link href="/expat-guide" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
             Expat Guide
           </Link>
           <Link href="#about" className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">
