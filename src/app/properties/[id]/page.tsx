@@ -1,4 +1,4 @@
-import { MapPin, Bed, Bath, Square, CheckCircle2, Share2, Heart, Calendar } from 'lucide-react';
+import { MapPin, Bed, Bath, Square, CheckCircle2, Share2, Heart, Calendar, Navigation } from 'lucide-react';
 import Link from 'next/link';
 
 import { notFound } from 'next/navigation';
@@ -133,15 +133,45 @@ export default async function PropertyDetailsPage({
               </div>
             </section>
 
-            {/* Maps Placeholder */}
+            {/* Location Map (Cost-Saving Static Strategy) */}
             <section className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100">
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Location Map</h2>
-              <div className="w-full h-[400px] bg-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-500 relative overflow-hidden">
-                {/* Simulated Map Background */}
-                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#CBD5E1_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                <MapPin className="w-12 h-12 text-indigo-400 mb-3" />
-                <p className="font-medium z-10">Google Maps Embed Placeholder</p>
-                <p className="text-sm z-10">Coordinates: 7.0097° N, 100.4705° E (Hat Yai)</p>
+              
+              <div className="w-full h-[300px] md:h-[400px] rounded-xl relative overflow-hidden group">
+                {/* Aesthetic Aerial / Map Background */}
+                <div 
+                  className="absolute inset-0 bg-slate-200 transition-transform duration-700 group-hover:scale-105"
+                  style={{
+                    backgroundImage: `url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=1000')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                />
+                {/* Overlay gradient to keep text legible */}
+                <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-slate-900/50 transition-colors duration-300" />
+                
+                {/* Center Content */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-4 shadow-[0_0_40px_rgba(255,255,255,0.3)]">
+                    <MapPin className="w-8 h-8 text-white animate-bounce" />
+                  </div>
+                  <h3 className="text-white text-xl font-bold mb-1 text-center drop-shadow-md">
+                    {PROPERTY_DATA.location}
+                  </h3>
+                  <p className="text-white/90 text-sm mb-6 text-center drop-shadow-sm max-w-xs">
+                    Coordinates: {PROPERTY_DATA.lat}° N, {PROPERTY_DATA.lng}° E
+                  </p>
+                  
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${PROPERTY_DATA.lat},${PROPERTY_DATA.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-full transition-all shadow-xl shadow-indigo-600/30 hover:-translate-y-1"
+                  >
+                    <Navigation className="w-5 h-5" />
+                    Open in Google Maps
+                  </a>
+                </div>
               </div>
             </section>
 
