@@ -1,0 +1,1 @@
+# mydev-hatyai-property-hub
