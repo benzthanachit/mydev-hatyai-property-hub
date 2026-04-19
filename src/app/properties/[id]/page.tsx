@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import { notFound } from 'next/navigation';
 import { FEATURED_PROPERTIES } from '@/lib/mockData';
+import PropertyGallery from '@/components/PropertyGallery';
 
 export default async function PropertyDetailsPage({
   params,
@@ -69,27 +70,7 @@ export default async function PropertyDetailsPage({
         </header>
 
         {/* Image Gallery Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12 h-[50vh] md:h-[60vh] max-h-[600px] min-h-[400px]">
-          <div className="md:col-span-2 md:row-span-2 rounded-2xl overflow-hidden relative group">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={PROPERTY_DATA.images[0]} alt="Main view" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          </div>
-          <div className="hidden md:block rounded-2xl overflow-hidden relative group">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={PROPERTY_DATA.images[1]} alt="View 2" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          </div>
-          <div className="hidden md:block rounded-2xl overflow-hidden relative group">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={PROPERTY_DATA.images[2]} alt="View 3" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          </div>
-          <div className="hidden md:block md:col-span-2 rounded-2xl overflow-hidden relative group">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={PROPERTY_DATA.images[3]} alt="View 4" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span className="text-white font-bold text-lg cursor-pointer">View All Photos</span>
-            </div>
-          </div>
-        </section>
+        <PropertyGallery images={PROPERTY_DATA.images} />
 
         {/* Main Content Area */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
