@@ -124,3 +124,23 @@ Once you have executed these scripts in your Supabase SQL Editor:
 1. Go to your Supabase Project Settings -> **API**.
 2. Copy your **Project URL** and **anon public key**.
 3. Let me know, and I will write the code to connect the Next.js app using `@supabase/supabase-js`.
+
+---
+
+## 🗺️ Google Maps API Setup (Autocomplete & Distance)
+
+This application uses the **Google Maps Platform** to provide localized Thai/English autocomplete and to calculate the distance from properties to searched neighborhoods.
+
+To enable this feature:
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project and set up your billing account (Google provides $200 free monthly credit).
+3. Enable the following APIs:
+   - **Places API** (for Autocomplete suggestions)
+   - **Maps JavaScript API** (required to load the client scripts)
+   - **Geocoding API** (optional, but recommended for full fallback support)
+4. Generate an **API Key** under "Credentials".
+5. Create a file named `.env.local` in the root of your project:
+   ```bash
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_actual_api_key_here
+   ```
+6. Restart your development server (`npm run dev`). The search bar will instantly transform into an intelligent Google Autocomplete input!

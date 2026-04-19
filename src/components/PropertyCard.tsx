@@ -11,6 +11,7 @@ interface PropertyCardProps {
   sqm: number;
   imageUrl: string;
   type: string;
+  distance?: number;
 }
 
 export default function PropertyCard({
@@ -23,6 +24,7 @@ export default function PropertyCard({
   sqm,
   imageUrl,
   type,
+  distance,
   status = 'For Sale',
 }: PropertyCardProps & { status?: string }) {
   return (
@@ -48,9 +50,16 @@ export default function PropertyCard({
 
       {/* Content Container */}
       <div className="p-5">
-        <div className="flex items-center gap-1.5 text-slate-500 mb-2">
-          <MapPin className="w-4 h-4" />
-          <span className="text-xs font-medium uppercase tracking-wider">{location}</span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-1.5 text-slate-500">
+            <MapPin className="w-4 h-4" />
+            <span className="text-xs font-medium uppercase tracking-wider">{location}</span>
+          </div>
+          {distance !== undefined && (
+            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+              📍 {distance.toFixed(1)} km away
+            </span>
+          )}
         </div>
         
         <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-1 group-hover:text-indigo-600 transition-colors">

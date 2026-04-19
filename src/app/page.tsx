@@ -1,8 +1,79 @@
-import { Search, ChevronDown, CheckCircle } from 'lucide-react';
+import { CheckCircle, SearchX } from 'lucide-react';
 import PropertyCard from '@/components/PropertyCard';
+import SearchBar from '@/components/SearchBar';
+import SortDropdown from '@/components/SortDropdown';
 import { FEATURED_PROPERTIES } from '@/lib/mockData';
+import { getDistanceFromLatLonInKm } from '@/lib/distance';
 
-export default function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const params = await searchParams;
+  const q = typeof params.q === 'string' ? params.q.toLowerCase() : '';
+  const status = typeof params.status === 'string' ? params.status : '';
+  const type = typeof params.type === 'string' ? params.type : '';
+  const userLat = typeof params.lat === 'string' ? parseFloat(params.lat) : null;
+  const userLng = typeof params.lng === 'string' ? parseFloat(params.lng) : null;
+  const sort = typeof params.sort === 'string' ? params.sort : '';
+
+  // Let's create an extended property type for the grid
+  let filteredProperties = FEATURED_PROPERTIES.map(p => ({
+    ...p,
+    distance: (userLat !== null && userLng !== null) 
+      ? getDistanceFromLatLonInKm(userLat, userLng, p.lat, p.lng) 
+      : undefined
+  }));
+
+  // If we only have text (user hit enter without picking an autocomplete suggestion)
+  if (q && (userLat === null || userLng === null)) {
+    filteredProperties = filteredProperties.filter(
+      p => p.location.toLowerCase().includes(q) || p.title.toLowerCase().includes(q)
+    );
+  }
+
+  // Filter based on dropdowns
+  if (status) {
+    filteredProperties = filteredProperties.filter(p => p.status === status);
+  }
+  if (type) {
+    filteredProperties = filteredProperties.filter(p => p.type === type);
+  }
+
+  // If spatial coordinates exist, filter within reasonable radius (30km bounds)
+  if (userLat !== null && userLng !== null) {
+    filteredProperties = filteredProperties.filter(p => p.distance !== undefined && p.distance <= 30);
+  }
+
+  // Parse price utility function
+  const parsePrice = (priceStr: string) => parseFloat(priceStr.replace(/,/g, ''));
+
+  // Sorting Logic
+  if (sort === 'price_asc') {
+    filteredProperties.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+  } else if (sort === 'price_desc') {
+    filteredProperties.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
+  } else if (sort === 'distance_asc') {
+    // If distance is missing, push to bottom
+    filteredProperties.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+  } else if (sort === 'distance_desc') {
+    // If distance is missing, push to bottom
+    filteredProperties.sort((a, b) => {
+      // Both undefined => equal
+      if (a.distance === undefined && b.distance === undefined) return 0;
+      // b undefined => a goes first
+      if (a.distance === undefined) return 1;
+      if (b.distance === undefined) return -1;
+      return b.distance - a.distance;
+    });
+  } else {
+    // Default Sort (if no sort applied) -> Nearest First if using search, else recommended order
+    if (userLat !== null && userLng !== null) {
+      filteredProperties.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+    }
+  }
+
   return (
     <div className="w-full">
       {/* Hero Section */}
@@ -29,50 +100,7 @@ export default function Home() {
           </p>
           
           {/* Search Bar */}
-          <div className="w-full max-w-4xl bg-white/10 backdrop-blur-md p-2 rounded-2xl md:rounded-full shadow-2xl border border-white/20">
-            <div className="flex flex-col md:flex-row items-center bg-white rounded-xl md:rounded-full overflow-hidden">
-              <div className="flex-1 flex items-center w-full px-6 py-4 md:border-r border-slate-200">
-                <Search className="w-5 h-5 text-slate-400 mr-3" />
-                <input
-                  type="text"
-                  placeholder="Neighborhood or zip code..."
-                  className="w-full bg-transparent outline-none text-slate-700 placeholder-slate-400 font-medium"
-                />
-              </div>
-              
-              <div className="w-full h-px bg-slate-100 md:hidden" />
-              
-              <div className="flex items-center w-full md:w-auto px-6 py-4 md:border-r border-slate-200 cursor-pointer group">
-                <div className="flex flex-col">
-                  <span className="text-xs text-slate-400 font-medium">Status</span>
-                  <span className="font-medium text-slate-600 group-hover:text-indigo-600 transition-colors w-24 truncate">Buy / Rent</span>
-                </div>
-                <ChevronDown className="w-4 h-4 text-slate-400 ml-2" />
-              </div>
-
-              <div className="w-full h-px bg-slate-100 md:hidden" />
-              
-              <div className="flex items-center w-full md:w-auto px-6 py-4 md:border-r border-slate-200 cursor-pointer group">
-                <span className="font-medium text-slate-600 group-hover:text-indigo-600 transition-colors flex-1 md:w-32 truncate">Property Type</span>
-                <ChevronDown className="w-4 h-4 text-slate-400" />
-              </div>
-
-              <div className="w-full h-px bg-slate-100 md:hidden" />
-
-              <div className="flex items-center w-full md:w-auto px-6 py-4 md:pr-2 cursor-pointer group">
-                <span className="font-medium text-slate-600 group-hover:text-indigo-600 transition-colors flex-1 md:w-32 truncate">Price Range</span>
-                <ChevronDown className="w-4 h-4 text-slate-400 mr-4" />
-                <button className="hidden md:block bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-full font-semibold transition-colors w-full md:w-auto">
-                  Search
-                </button>
-              </div>
-              <div className="w-full p-2 md:hidden">
-                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-semibold transition-colors w-full">
-                  Search
-                </button>
-              </div>
-            </div>
-          </div>
+          <SearchBar />
         </div>
       </section>
 
@@ -84,16 +112,24 @@ export default function Home() {
               <h2 className="text-3xl font-bold text-slate-900 mb-4">Featured Listings</h2>
               <p className="text-slate-600 text-lg">Handpicked premium properties available right now.</p>
             </div>
-            <button className="mt-6 md:mt-0 px-6 py-2.5 text-indigo-600 font-semibold border-2 border-indigo-100 rounded-full hover:bg-indigo-50 hover:border-indigo-200 transition-colors w-max">
-              View All Properties
-            </button>
+            <SortDropdown />
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {FEATURED_PROPERTIES.map((property) => (
-              <PropertyCard key={property.id} {...property} />
-            ))}
-          </div>
+          {filteredProperties.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+              {filteredProperties.map((property) => (
+                <PropertyCard key={property.id} {...property} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-16 text-center bg-white border border-slate-200 rounded-3xl w-full flex flex-col items-center">
+              <SearchX className="w-16 h-16 text-slate-300 mb-4" />
+              <h3 className="text-xl font-bold text-slate-700 mb-2">No properties found</h3>
+              <p className="text-slate-500 max-w-md mx-auto">
+                We couldn't find any properties matching your criteria. Try adjusting your search filters.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
